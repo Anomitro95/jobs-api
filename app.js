@@ -24,7 +24,7 @@ const errorHandlerMiddleware = require('./middleware/error-handler');
 
 //middlewares
 const authenticationUser = require('./middleware/authentication')
-
+//extra security packages
 app.set('trust proxy', 1)
 app.use(rateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -38,11 +38,17 @@ app.use(helmet())
 app.use(cors())
 app.use(xss())
 
+//Swagger
+const swaggerUI = require('swagger-ui-express')
+const YAML = require('yamljs')
+const swaggerDocument = YAML.load('./swagger.yaml')
 
 // health checkup :::
 app.get('/', (req, res)=>{
-    res.send('jobs api is up!')
+    res.send('<h1> jobs API </h1> <a href = "/api-docs">Documentation</a>')
 })
+
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument))
 // routes
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/jobs', authenticationUser,  jobsRouter)
